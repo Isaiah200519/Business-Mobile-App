@@ -1,4 +1,4 @@
-  <!-- Save as index.html -->
+<!-- Save as index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,44 +39,30 @@ header {
   font-size: 1.2rem;
   font-weight: bold;
 }
+ 
 .header-center {
   flex: 1;
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   margin: 5px 0;
   gap: 8px;
+  flex-wrap: nowrap; /* ✅ Force one line */
+  overflow-x: auto;   /* ✅ Prevent overflow issues */
 }
 .header-center input {
   padding: 8px;
   border-radius: 6px;
   border: none;
   width: 160px;
+  min-width: 0;
   transition: box-shadow 0.3s ease;
-}
-.header-center input:focus {
-  box-shadow: 0 0 8px 2px #007bffaa;
-  outline: none;
-}
-.header-center button {
-  background: white;
-  color: #007bff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-.header-center button:hover {
-  background: #f0f8ff;
-  transform: scale(1.05);
-}
+  flex-shrink: 1; /* ✅ Allows shrinking on narrow screens */
+} 
+
 .header-right {
   font-size: 0.9rem;
 }
-
-
 
 /* Summary Stats */
 .summary-stats {
@@ -257,47 +243,26 @@ button.green:hover {
 }
 
 /* Responsive Enhancements */
- @media (max-width: 600px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 15px;
-  }
-
-  .header-left,
-  .header-center,
-  .header-right {
-    width: 100%;
-    justify-content: flex-start;
-    margin-bottom: 5px;
-  }
-
+@media (max-width: 480px) {
   .header-center {
     flex-direction: column;
     align-items: stretch;
-    gap: 6px;
   }
-
-  .header-center input,
-  .header-center button {
+  .header-center input {
     width: 100%;
   }
-
+ 
+  .totals {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .summary-card {
     flex: 1 1 100%;
   }
-
-  .totals {
-    flex-direction: column;
-    gap: 8px;
-  }
-
   button {
     width: 100%;
   }
 }
-
 </style>
 </head>
 <body>
@@ -308,7 +273,7 @@ button.green:hover {
   </div>
   <div class="header-center">
     <input type="text" id="searchInput" placeholder="Search name...">
-    <button onclick="searchBuyer()"><i class="fas fa-search"></i></button>
+  
   </div>
   <div class="header-right">
     Buyers: <span id="buyerCount">0</span>
