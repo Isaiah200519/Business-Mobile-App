@@ -1,0 +1,658 @@
+<!-- Save as index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Business Record App</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* Basic Reset */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6fa;
+  color: #333;
+}
+
+/* Fixed Header */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: auto;
+  background: #007bff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  color: white;
+  z-index: 1000;
+  flex-wrap: wrap;
+}
+.header-left {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.header-center {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 5px 0;
+  gap: 8px;
+}
+.header-center input {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  width: 160px;
+  transition: box-shadow 0.3s ease;
+}
+.header-center input:focus {
+  box-shadow: 0 0 8px 2px #007bffaa;
+  outline: none;
+}
+.header-center button {
+  background: white;
+  color: #007bff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.header-center button:hover {
+  background: #f0f8ff;
+  transform: scale(1.05);
+}
+.header-right {
+  font-size: 0.9rem;
+}
+
+/* Summary Stats */
+.summary-stats {
+  margin-top: 75px;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.summary-card {
+  background: #e0f0ff;
+  padding: 12px;
+  border-radius: 12px;
+  flex: 1 1 30%;
+  min-width: 140px;
+  text-align: center;
+  color: #007bff;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+  transition: 0.2s ease;
+}
+.summary-card:hover {
+  background: #d6eaff;
+}
+
+/* Main container */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Form layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+input, select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  transition: box-shadow 0.3s ease;
+}
+input:focus, select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 8px 2px #007bff55;
+}
+
+/* Buttons */
+button {
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-size: 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+button:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+button.green {
+  background: #28a745;
+}
+button.green:hover {
+  background: #1e7e34;
+}
+
+/* Totals */
+.totals {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  font-weight: bold;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Product container */
+#productsContainer div {
+  background: #eef5ff;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Buyer Cards */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.buyer-card-box {
+  background: #fff;
+  border: 1px solid #007bff22;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #444;
+  transition: 0.2s ease;
+  animation: fadeInUp 0.5s ease forwards;
+}
+.buyer-card-box:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+}
+
+.buyer-card-header h3 {
+  color: #007bff;
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+.buyer-card-body ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0;
+}
+.buyer-card-body li {
+  background: #f0f8ff;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+}
+
+.buyer-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.buyer-buttons button {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.buyer-buttons button:first-child {
+  background: #007bff;
+  color: white;
+}
+.buyer-buttons button:first-child:hover {
+  transform: scale(1.1);
+  background: #0056b3;
+}
+.buyer-buttons button:last-child {
+  background: #dc3545;
+  color: white;
+}
+.buyer-buttons button:last-child:hover {
+  transform: scale(1.1);
+  background: #a71d2a;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 480px) {
+  .header-center {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .header-center input {
+    width: 100%;
+  }
+  .header-center button {
+    width: 100%;
+  }
+  .totals {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .summary-card {
+    flex: 1 1 100%;
+  }
+  button {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <i class="fas fa-store"></i>&nbsp;<strong>BizApp</strong>
+  </div>
+  <div class="header-center">
+    <input type="text" id="searchInput" placeholder="Search name...">
+    <button onclick="searchBuyer()"><i class="fas fa-search"></i></button>
+  </div>
+  <div class="header-right">
+    Buyers: <span id="buyerCount">0</span>
+  </div>
+</header>
+
+<section class="summary-stats">
+  <div class="summary-card">
+    Total LRD<br><span id="summaryLRD">0</span>
+  </div>
+  <div class="summary-card">
+    Total USD<br><span id="summaryUSD">0</span>
+  </div>
+  <div class="summary-card">
+    Products<br><span id="summaryProducts">0</span>
+  </div>
+</section>
+
+<main class="container">
+  <h2>Add Buyer</h2>
+  <div class="form-grid">
+    <input type="text" id="buyerName" placeholder="Buyer Name" />
+    <input type="text" id="buyerNumber" placeholder="Phone Number" />
+    <input type="date" id="buyDate" />
+    <input type="time" id="buyTime" />
+  </div>
+
+  <h3>Products for Buyer</h3>
+  <div id="productsContainer"></div>
+
+  <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+    <select id="productSelect" style="flex: 1 1 160px; min-width: 160px;">
+      <option value="">Select Product</option>
+      <option>Soap</option>
+      <option>Toothpaste</option>
+      <option>Milk</option>
+      <option>Water</option>
+      <option>Sardine</option>
+    </select>
+    <input
+      type="number"
+      id="productQty"
+      placeholder="Quantity"
+      min="1"
+      value="1"
+      style="width: 100px; flex-shrink: 0;"
+    />
+    <input
+      type="number"
+      id="productPrice"
+      placeholder="Unit Price (LRD)"
+      min="0"
+      value="0"
+      style="width: 130px; flex-shrink: 0;"
+    />
+  </div>
+  <button type="button" onclick="addProduct()">Add Product</button>
+
+  <div class="totals">
+    <div>Total LRD: <span id="totalLRD">0</span></div>
+    <div>Total USD: <span id="totalUSD">0</span></div>
+  </div>
+
+  <button onclick="addBuyer()">Add Buyer</button>
+  <button onclick="exportPDF()" class="green" style="margin-left: 10px;">Export to PDF</button>
+
+  <h3>Buyers List</h3>
+  <div id="buyerList"></div>
+  <canvas id="buyerChart" style="max-width: 100%; height: 300px; margin-top: 20px;"></canvas>
+</main>
+
+<script>
+const conversionRate = 195;
+let buyers = JSON.parse(localStorage.getItem("buyers") || "[]");
+let chartInstance;
+let editIndex = -1;
+let currentProducts = [];
+
+function addProduct() {
+  const product = document.getElementById("productSelect").value;
+  const qty = +document.getElementById("productQty").value;
+  const unitPrice = +document.getElementById("productPrice").value;
+
+  if (!product || qty < 1 || unitPrice < 0) {
+    alert("Please select a product and enter valid quantity and price.");
+    return;
+  }
+
+  const existing = currentProducts.find((p) => p.product === product);
+  if (existing) {
+    existing.qty += qty;
+    existing.unitPrice = unitPrice; // Update or keep old price as needed
+    existing.total = existing.qty * existing.unitPrice;
+  } else {
+    currentProducts.push({ product, qty, unitPrice, total: qty * unitPrice });
+  }
+
+  renderProducts();
+  clearProductInputs();
+}
+
+function renderProducts() {
+  const container = document.getElementById("productsContainer");
+  container.innerHTML = "";
+
+  currentProducts.forEach((p, i) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div>${p.product} | Qty: ${p.qty} | Unit Price: ${p.unitPrice.toFixed(
+      2
+    )} LRD | Total: ${p.total.toFixed(2)} LRD</div>
+      <button onclick="removeProduct(${i})" style="background:#dc3545; border:none; color:white; border-radius:4px; padding:2px 6px; cursor:pointer;">Remove</button>
+    `;
+    container.appendChild(div);
+  });
+
+  const totalLRD = currentProducts.reduce((acc, p) => acc + p.total, 0);
+  document.getElementById("totalLRD").innerText = totalLRD.toFixed(2);
+  document.getElementById("totalUSD").innerText = (totalLRD / conversionRate).toFixed(2);
+}
+
+function removeProduct(index) {
+  currentProducts.splice(index, 1);
+  renderProducts();
+}
+
+function clearProductInputs() {
+  document.getElementById("productSelect").value = "";
+  document.getElementById("productQty").value = "1";
+  document.getElementById("productPrice").value = "0";
+}
+
+function addBuyer() {
+  const name = document.getElementById("buyerName").value.trim();
+  const number = document.getElementById("buyerNumber").value.trim();
+  const date = document.getElementById("buyDate").value;
+  const time = document.getElementById("buyTime").value;
+
+  if (!name || !number || !date || !time) {
+    alert("Please fill all buyer details.");
+    return;
+  }
+
+  if (currentProducts.length === 0) {
+    alert("Please add at least one product.");
+    return;
+  }
+
+  const total = currentProducts.reduce((acc, p) => acc + p.total, 0);
+  const buyerData = { name, number, products: [...currentProducts], total, date, time };
+
+  if (editIndex > -1) {
+    buyers[editIndex] = buyerData;
+    editIndex = -1;
+  } else {
+    buyers.push(buyerData);
+  }
+
+  localStorage.setItem("buyers", JSON.stringify(buyers));
+
+  // Reset form and products list
+  document.getElementById("buyerName").value = "";
+  document.getElementById("buyerNumber").value = "";
+  document.getElementById("buyDate").value = "";
+  document.getElementById("buyTime").value = "";
+  currentProducts = [];
+  renderProducts();
+  document.getElementById("totalLRD").innerText = "0";
+  document.getElementById("totalUSD").innerText = "0";
+
+  renderBuyers();
+}
+
+function renderBuyers(filter = "") {
+  const container = document.getElementById("buyerList");
+  container.innerHTML = "";
+  const filtered = buyers.filter((b) =>
+    b.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  document.getElementById("buyerCount").innerText = filtered.length;
+
+  let totalLRD = 0;
+  let productSet = new Set();
+
+  filtered.forEach((b, i) => {
+    totalLRD += b.total;
+    b.products.forEach((p) => productSet.add(p.product));
+
+    const card = document.createElement("div");
+    card.className = "buyer-card-box";
+    card.style.animationDelay = `${i * 0.1}s`;
+
+    card.innerHTML = `
+      <div class="buyer-card-header">
+        <h3>👦 Buyer #${i + 1}: <span>${b.name}</span></h3>
+        <p>📞 <strong>${b.number}</strong></p>
+      </div>
+      <div class="buyer-card-body">
+        <p>🛍️ <strong>Products Bought:</strong></p>
+        <ul>
+          ${b.products
+            .map(
+              (p) => `
+            <li>
+              🧴 ${p.product} — 
+              <strong>${p.qty}</strong> pcs @ 
+              <strong>${p.unitPrice.toFixed(2)} LRD</strong> each 
+              = <strong>${p.total.toFixed(2)} LRD</strong>
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      </div>
+      <div class="buyer-card-footer">
+        <p>💰 <strong>Total:</strong> ${b.total.toFixed(2)} LRD (~${(
+      b.total / conversionRate
+    ).toFixed(2)} USD)</p>
+        <p>📅 <strong>Date:</strong> ${b.date} ⏰ <strong>Time:</strong> ${b.time}</p>
+        <div class="buyer-buttons">
+          <button onclick="event.stopPropagation(); editBuyer(${i});">✏️ Edit</button>
+          <button onclick="event.stopPropagation(); deleteBuyer(${i});">🗑️ Delete</button>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  document.getElementById("summaryLRD").innerText = totalLRD.toFixed(2);
+  document.getElementById("summaryUSD").innerText = (totalLRD / conversionRate).toFixed(2);
+  document.getElementById("summaryProducts").innerText = productSet.size;
+
+  drawChart(filtered);
+}
+
+function editBuyer(index) {
+  const b = buyers[index];
+  document.getElementById("buyerName").value = b.name;
+  document.getElementById("buyerNumber").value = b.number;
+  document.getElementById("buyDate").value = b.date;
+  document.getElementById("buyTime").value = b.time;
+  currentProducts = [...b.products];
+  renderProducts();
+  editIndex = index;
+}
+
+function deleteBuyer(index) {
+  if (confirm("Are you sure you want to delete this buyer?")) {
+    buyers.splice(index, 1);
+    localStorage.setItem("buyers", JSON.stringify(buyers));
+    renderBuyers();
+  }
+}
+
+function searchBuyer() {
+  const term = document.getElementById("searchInput").value;
+  renderBuyers(term);
+}
+
+function drawChart(data) {
+  const ctx = document.getElementById("buyerChart").getContext("2d");
+  if (chartInstance) chartInstance.destroy();
+
+  const chartData = {};
+  data.forEach((b) => {
+    b.products.forEach((p) => {
+      chartData[p.product] = (chartData[p.product] || 0) + p.total;
+    });
+  });
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, "#4dabf7");
+  gradient.addColorStop(1, "#1e3a8a");
+
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(chartData),
+      datasets: [
+        {
+          label: "Sales in LRD",
+          data: Object.values(chartData),
+          backgroundColor: gradient,
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      animation: {
+        duration: 1000,
+        easing: "easeOutQuart",
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#007bff",
+          titleColor: "#fff",
+          bodyColor: "#e0e0e0",
+          cornerRadius: 6,
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            font: { size: 14 },
+            color: "#007bff",
+          },
+          grid: {
+            color: "#e0e0e0",
+          },
+        },
+        x: {
+          ticks: {
+            font: { size: 14 },
+            color: "#007bff",
+          },
+          grid: {
+            display: false,
+          },
+        },
+      },
+    },
+  });
+}
+
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Buyers Report", 10, 10);
+
+  buyers.forEach((b, i) => {
+    let productDetails = b.products
+      .map((p) => `${p.product} (Qty: ${p.qty}, Unit: ${p.unitPrice.toFixed(2)})`)
+      .join("; ");
+    doc.text(
+      `${i + 1}. ${b.name} - ${productDetails} - Total LRD: ${b.total.toFixed(
+        2
+      )} - Date: ${b.date}`,
+      10,
+      20 + i * 10
+    );
+  });
+
+  doc.save("buyers-report.pdf");
+}
+
+renderBuyers();
+renderProducts();
+
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    searchBuyer();
+  }
+});
+
+searchInput.addEventListener("input", function () {
+  searchBuyer();
+});
+</script>
+</body>
+</html>
