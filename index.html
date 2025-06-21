@@ -1,4 +1,4 @@
-<!-- Save as index.html -->
+  <!-- Save as index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,10 +47,7 @@ header {
   align-items: center;
   margin: 5px 0;
   gap: 8px;
-  margin-left:5px;
-  margin-right:5px;
 }
-
 .header-center input {
   padding: 8px;
   border-radius: 6px;
@@ -78,6 +75,8 @@ header {
 .header-right {
   font-size: 0.9rem;
 }
+
+
 
 /* Summary Stats */
 .summary-stats {
@@ -258,28 +257,47 @@ button.green:hover {
 }
 
 /* Responsive Enhancements */
-@media (max-width: 480px) {
+ @media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 15px;
+  }
+
+  .header-left,
+  .header-center,
+  .header-right {
+    width: 100%;
+    justify-content: flex-start;
+    margin-bottom: 5px;
+  }
+
   .header-center {
     flex-direction: column;
     align-items: stretch;
+    gap: 6px;
   }
-  .header-center input {
-    width: 100%;
-  }
+
+  .header-center input,
   .header-center button {
     width: 100%;
   }
-  .totals {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+
   .summary-card {
     flex: 1 1 100%;
   }
+
+  .totals {
+    flex-direction: column;
+    gap: 8px;
+  }
+
   button {
     width: 100%;
   }
 }
+
 </style>
 </head>
 <body>
@@ -290,6 +308,7 @@ button.green:hover {
   </div>
   <div class="header-center">
     <input type="text" id="searchInput" placeholder="Search name...">
+    <button onclick="searchBuyer()"><i class="fas fa-search"></i></button>
   </div>
   <div class="header-right">
     Buyers: <span id="buyerCount">0</span>
